@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface ColorEntry { name: string; hex: string; use: string; }
 interface Palette { name: string; description: string; colors: ColorEntry[]; }
@@ -56,6 +56,18 @@ export default function Home() {
   const [kit, setKit] = useState<BrandKit | null>(null);
   const [selectedPalette, setSelectedPalette] = useState(0);
   const [selectedTagline, setSelectedTagline] = useState(0);
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved">("idle");
+  const [capraseedIdea, setCapraseedIdea] = useState<string | null>(null);
+
+  // Pre-fill from CapraSeed URL params: ?brand=X&industry=Y&vibe=Z&idea=...
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search);
+    if (p.get("brand")) setBrandName(p.get("brand")!);
+    if (p.get("industry")) setIndustry(p.get("industry")!);
+    if (p.get("vibe")) setVibe(p.get("vibe")!);
+    if (p.get("keywords")) setKeywords(p.get("keywords")!);
+    if (p.get("idea")) setCapraseedIdea(p.get("idea")!);
+  }, []);
 
   async function generate() {
     if (!brandName.trim()) return;
@@ -73,6 +85,13 @@ export default function Home() {
       setKit(data);
       setSelectedPalette(0);
       setSelectedTagline(0);
+      setSaveState("idle");
+      // Auto-save to Supabase
+      fetch("/api/save-kit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ brandName, industry, keywords, vibe, kit: data, capraseedIdea }),
+      }).then(r => r.json()).then(d => { if (d.saved) setSaveState("saved"); }).catch(() => {});
       // Inject Google Fonts
       if (data.fonts?.heading?.name || data.fonts?.body?.name) {
         const families = [data.fonts.heading?.name, data.fonts.body?.name]
@@ -322,21 +341,26 @@ export default function Home() {
               <div className="card" style={{ background: "rgba(124,58,237,0.08)", borderColor: "var(--accent)" }}>
                 <div className="section-title">Next Steps</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  <button
-                    className="btn btn-ghost"
-                    style={{ justifyContent: "center" }}
-                    onClick={() => window.print()}
-                  >
+                  <button className="btn btn-ghost" style={{ justifyContent: "center" }} onClick={() => window.print()}>
                     Print / Save as PDF
                   </button>
-                  <button
-                    className="btn btn-primary"
-                    style={{ justifyContent: "center" }}
-                    onClick={generate}
-                    disabled={loading}
-                  >
+                  <button className="btn btn-primary" style={{ justifyContent: "center" }} onClick={generate} disabled={loading}>
                     ↻ Regenerate Kit
                   </button>
+                  {saveState === "saved"
+                    ? <span style={{ textAlign: "center", fontSize: 13, color: "var(--ok)" }}>✓ Saved to CapraStarter</span>
+                    : saveState === "saving"
+                    ? <span style={{ textAlign: "center", fontSize: 13, color: "var(--muted)" }}>Saving…</span>
+                    : kit && (
+                      <button className="btn btn-ghost" style={{ justifyContent: "center" }} onClick={async () => {
+                        setSaveState("saving");
+                        const r = await fetch("/api/save-kit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ brandName, industry, keywords, vibe, kit, capraseedIdea }) });
+                        const d = await r.json();
+                        setSaveState(d.saved ? "saved" : "idle");
+                      }}>
+                        Save Kit
+                      </button>
+                    )}
                 </div>
               </div>
             </div>
