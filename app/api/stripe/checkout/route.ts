@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe, PRICES, PRICE_MODES } from "@/lib/stripe";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: NextRequest) {
   const tier = req.nextUrl.searchParams.get("tier") ?? "";
   const priceId = PRICES[tier];
