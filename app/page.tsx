@@ -114,6 +114,17 @@ export default function Home() {
 
   return (
     <main>
+      {/* Nav */}
+      <nav className="navbar">
+        <div className="container navbar-inner">
+          <a href="/" className="navbar-brand">Brand<span>Starter</span></a>
+          <div className="navbar-links">
+            <a href="#how-it-works" className="btn btn-ghost" style={{ padding: "8px 16px", fontSize: 14 }}>How it works</a>
+            <a href="#pricing" className="btn btn-primary" style={{ padding: "8px 16px", fontSize: 14 }}>Pricing</a>
+          </div>
+        </div>
+      </nav>
+
       {/* Hero */}
       <section className="hero">
         <div className="container">
@@ -395,6 +406,72 @@ export default function Home() {
           </div>
         </section>
       )}
+
+      {/* Pricing */}
+      {!kit && (
+        <section id="pricing" style={{ padding: "60px 20px 80px", borderTop: "1px solid var(--border)" }}>
+          <div className="container">
+            <h2 style={{ textAlign: "center", fontSize: "1.6rem", fontWeight: 800, marginBottom: 10 }}>Simple pricing</h2>
+            <p className="muted" style={{ textAlign: "center", marginBottom: 48 }}>Start free. Export when you're ready.</p>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 20, maxWidth: 920, margin: "0 auto" }}>
+              {[
+                {
+                  name: "Free", price: "€0", period: "forever", highlight: false,
+                  features: ["1 brand kit generation", "Preview colors & taglines", "Logo concept brief", "Copy hex codes"],
+                  cta: "Generate free kit", ctaStyle: "btn-ghost",
+                },
+                {
+                  name: "Export", price: "€12", period: "one-time", highlight: false,
+                  features: ["Everything in Free", "Full PDF brand kit download", "Hex code export sheet", "Saved to your account"],
+                  cta: "Buy Export pack", ctaStyle: "btn-ghost",
+                },
+                {
+                  name: "Pro", price: "€9", period: "/mo", highlight: true,
+                  features: ["Unlimited generations", "10 saved brand kits", "PDF exports included", "Multiple palette variations", "Priority processing"],
+                  cta: "Start Pro", ctaStyle: "btn-primary",
+                },
+                {
+                  name: "Agency", price: "€49", period: "/mo", highlight: false,
+                  features: ["Unlimited saved kits", "White-label PDF exports", "Client workspaces", "Custom branding", "Priority support"],
+                  cta: "Contact us", ctaStyle: "btn-ghost",
+                },
+              ].map((tier) => (
+                <div key={tier.name} className="card" style={{
+                  display: "flex", flexDirection: "column", gap: 16, position: "relative",
+                  ...(tier.highlight ? { border: "2px solid var(--accent)", background: "rgba(124,58,237,0.06)" } : {}),
+                }}>
+                  {tier.highlight && (
+                    <div style={{ position: "absolute", top: -13, left: "50%", transform: "translateX(-50%)", background: "var(--accent)", color: "white", fontSize: 11, fontWeight: 700, padding: "3px 14px", borderRadius: 20, textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>
+                      Most popular
+                    </div>
+                  )}
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>{tier.name}</div>
+                    <div style={{ fontSize: "2rem", fontWeight: 900, lineHeight: 1 }}>
+                      {tier.price}<span style={{ fontSize: "0.9rem", fontWeight: 500, color: "var(--muted)" }}>{tier.period}</span>
+                    </div>
+                  </div>
+                  <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 8, flex: 1 }}>
+                    {tier.features.map(f => (
+                      <li key={f} style={{ fontSize: 13, display: "flex", gap: 8, alignItems: "flex-start", lineHeight: 1.4 }}>
+                        <span style={{ color: "var(--ok)", flexShrink: 0 }}>✓</span>{f}
+                      </li>
+                    ))}
+                  </ul>
+                  <button className={`btn ${tier.ctaStyle}`} style={{ width: "100%", justifyContent: "center" }}>
+                    {tier.cta}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Footer */}
+      <footer style={{ borderTop: "1px solid var(--border)", padding: "20px", textAlign: "center", fontSize: 13, color: "var(--muted)" }}>
+        © {new Date().getFullYear()} BrandStarter · Powered by Claude AI
+      </footer>
     </main>
   );
 }
