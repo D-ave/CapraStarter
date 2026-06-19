@@ -418,22 +418,22 @@ export default function Home() {
                 {
                   name: "Free", price: "€0", period: "forever", highlight: false,
                   features: ["1 brand kit generation", "Preview colors & taglines", "Logo concept brief", "Copy hex codes"],
-                  cta: "Generate free kit", ctaStyle: "btn-ghost",
+                  cta: "Generate free kit", ctaStyle: "btn-ghost", href: null,
                 },
                 {
                   name: "Export", price: "€12", period: "one-time", highlight: false,
                   features: ["Everything in Free", "Full PDF brand kit download", "Hex code export sheet", "Saved to your account"],
-                  cta: "Buy Export pack", ctaStyle: "btn-ghost",
+                  cta: "Buy Export pack", ctaStyle: "btn-ghost", href: "/api/stripe/checkout?tier=export",
                 },
                 {
                   name: "Pro", price: "€9", period: "/mo", highlight: true,
                   features: ["Unlimited generations", "10 saved brand kits", "PDF exports included", "Multiple palette variations", "Priority processing"],
-                  cta: "Start Pro", ctaStyle: "btn-primary",
+                  cta: "Start Pro", ctaStyle: "btn-primary", href: "/api/stripe/checkout?tier=pro",
                 },
                 {
                   name: "Agency", price: "€49", period: "/mo", highlight: false,
                   features: ["Unlimited saved kits", "White-label PDF exports", "Client workspaces", "Custom branding", "Priority support"],
-                  cta: "Contact us", ctaStyle: "btn-ghost",
+                  cta: "Contact us", ctaStyle: "btn-ghost", href: "/api/stripe/checkout?tier=agency",
                 },
               ].map((tier) => (
                 <div key={tier.name} className="card" style={{
@@ -458,9 +458,15 @@ export default function Home() {
                       </li>
                     ))}
                   </ul>
-                  <button className={`btn ${tier.ctaStyle}`} style={{ width: "100%", justifyContent: "center" }}>
-                    {tier.cta}
-                  </button>
+                  {tier.href ? (
+                    <a href={tier.href} className={`btn ${tier.ctaStyle}`} style={{ width: "100%", justifyContent: "center", textDecoration: "none", display: "flex" }}>
+                      {tier.cta}
+                    </a>
+                  ) : (
+                    <button className={`btn ${tier.ctaStyle}`} style={{ width: "100%", justifyContent: "center" }}>
+                      {tier.cta}
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
