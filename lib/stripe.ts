@@ -1,7 +1,20 @@
 import Stripe from "stripe";
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2026-05-27.dahlia",
+let _client: Stripe | null = null;
+function getClient(): Stripe {
+  if (!_client) {
+    _client = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+      apiVersion: "2026-05-27.dahlia",
+    });
+  }
+  return _client;
+}
+
+// Proxy defers instantiation until first use inside a request handler
+export const stripe: Stripe = new Proxy({} as Stripe, {
+  get(_t, prop: string | symbol) {
+    return Reflect.get(getClient(), prop);
+  },
 });
 
 export const PRICES: Record<string, string | undefined> = {
