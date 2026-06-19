@@ -418,7 +418,7 @@ export default function Home() {
                 {
                   name: "Free", price: "€0", period: "forever", highlight: false,
                   features: ["1 brand kit generation", "Preview colors & taglines", "Logo concept brief", "Copy hex codes"],
-                  cta: "Generate free kit", ctaStyle: "btn-ghost", href: null,
+                  cta: "Generate free kit", ctaStyle: "btn-ghost", href: "/",
                 },
                 {
                   name: "Export", price: "€12", period: "one-time", highlight: false,
