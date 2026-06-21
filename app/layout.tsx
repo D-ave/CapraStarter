@@ -16,6 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <a href="/" className="navbar-brand">Capra<span>Starter</span></a>
             <div className="navbar-links">
               <a href="/#how-it-works" className="btn btn-ghost" style={{ padding: "8px 16px", fontSize: "14px" }}>How it works</a>
+              <a href="/#pricing" className="btn btn-primary" style={{ padding: "8px 16px", fontSize: "14px" }}>Pricing</a>
             </div>
           </div>
         </nav>

@@ -114,17 +114,6 @@ export default function Home() {
 
   return (
     <main>
-      {/* Nav */}
-      <nav className="navbar">
-        <div className="container navbar-inner">
-          <a href="/" className="navbar-brand">Brand<span>Starter</span></a>
-          <div className="navbar-links">
-            <a href="#how-it-works" className="btn btn-ghost" style={{ padding: "8px 16px", fontSize: 14 }}>How it works</a>
-            <a href="#pricing" className="btn btn-primary" style={{ padding: "8px 16px", fontSize: 14 }}>Pricing</a>
-          </div>
-        </div>
-      </nav>
-
       {/* Hero */}
       <section className="hero">
         <div className="container">
@@ -476,7 +465,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer style={{ borderTop: "1px solid var(--border)", padding: "20px", textAlign: "center", fontSize: 13, color: "var(--muted)" }}>
-        © {new Date().getFullYear()} BrandStarter · Powered by Claude AI
+        © {new Date().getFullYear()} CapraStarter · Powered by Claude AI
       </footer>
     </main>
   );
