@@ -1,11 +1,30 @@
-import Anthropic from "@anthropic-ai/sdk";
-import { NextRequest, NextResponse } from "next/server";
+import Anthropic from "@anthropic-ai/sdk"
+import { NextRequest, NextResponse } from "next/server"
+import { createClient } from "@/lib/supabase-server"
+import { getUserSubscription, getUserGenerationCount, canGenerate } from "@/lib/subscription"
 
-const client = new Anthropic();
+const client = new Anthropic()
 
 export async function POST(req: NextRequest) {
-  const { brandName, industry, keywords, vibe } = await req.json();
-  if (!brandName) return NextResponse.json({ error: "brandName required" }, { status: 400 });
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return NextResponse.json({ error: "Authentication required", code: "UNAUTHENTICATED" }, { status: 401 })
+  }
+
+  const subscription = await getUserSubscription(user.id)
+  const generationCount = await getUserGenerationCount(user.id)
+
+  if (!canGenerate(subscription.plan, generationCount)) {
+    return NextResponse.json(
+      { error: "Free tier limit reached. Upgrade to Pro for unlimited generations.", code: "UPGRADE_REQUIRED" },
+      { status: 403 }
+    )
+  }
+
+  const { brandName, industry, keywords, vibe } = await req.json()
+  if (!brandName) return NextResponse.json({ error: "brandName required" }, { status: 400 })
 
   const prompt = `You are a brand strategist and creative director. Generate a complete brand kit for the following brand:
 
@@ -41,23 +60,23 @@ Return ONLY valid JSON matching this exact structure:
   "competitors": ["Competitor 1", "Competitor 2", "Competitor 3"]
 }
 
-Generate exactly 3 palettes. Make the palettes distinct from each other (e.g., one bold/dark, one light/minimal, one colorful). All hex codes must be valid 6-digit hex values. Do not include any text outside the JSON.`;
+Generate exactly 3 palettes. Make the palettes distinct from each other (e.g., one bold/dark, one light/minimal, one colorful). All hex codes must be valid 6-digit hex values. Do not include any text outside the JSON.`
 
   try {
     const msg = await client.messages.create({
       model: "claude-haiku-4-5-20251001",
       max_tokens: 2000,
       messages: [{ role: "user", content: prompt }],
-    });
+    })
 
-    const text = (msg.content[0] as { type: string; text: string }).text.trim();
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error("No JSON in response");
+    const text = (msg.content[0] as { type: string; text: string }).text.trim()
+    const jsonMatch = text.match(/\{[\s\S]*\}/)
+    if (!jsonMatch) throw new Error("No JSON in response")
 
-    const kit = JSON.parse(jsonMatch[0]);
-    return NextResponse.json(kit);
+    const kit = JSON.parse(jsonMatch[0])
+    return NextResponse.json(kit)
   } catch (e) {
-    console.error(e);
-    return NextResponse.json({ error: "Generation failed" }, { status: 500 });
+    console.error(e)
+    return NextResponse.json({ error: "Generation failed" }, { status: 500 })
   }
 }

@@ -80,6 +80,16 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ brandName, industry, keywords, vibe }),
       });
+      if (res.status === 401) {
+        window.location.href = "/login";
+        return;
+      }
+      if (res.status === 403) {
+        const data = await res.json();
+        setError(data.error ?? "Upgrade required to generate more kits.");
+        setLoading(false);
+        return;
+      }
       if (!res.ok) throw new Error("Generation failed");
       const data = await res.json();
       setKit(data);
