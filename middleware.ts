@@ -21,8 +21,17 @@ export async function middleware(request: NextRequest) {
     }
   )
 
+  const { pathname, searchParams } = request.nextUrl
+
+  // If Supabase redirected the auth code to the wrong URL, forward it to the callback handler
+  const code = searchParams.get("code")
+  if (code && !pathname.startsWith("/auth/")) {
+    const callbackUrl = new URL("/auth/callback", request.url)
+    callbackUrl.searchParams.set("code", code)
+    return NextResponse.redirect(callbackUrl)
+  }
+
   const { data: { user } } = await supabase.auth.getUser()
-  const { pathname } = request.nextUrl
 
   if (!user && pathname.startsWith("/dashboard")) {
     return NextResponse.redirect(new URL("/login", request.url))
