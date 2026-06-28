@@ -1,0 +1,25 @@
+/* CapraSeed local theme — scoped to this layout slice.
+   Defines CSS custom properties that all child components consume.
+   These intentionally shadow any parent-level variables of the same name
+   only within this subtree. */
+
+.root {
+  /* Color palette */
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --surface2: #1a1a26;
+  --border: rgba(255, 255, 255, 0.07);
+  --text: #f0ede8;
+  --muted: #7a7a8a;
+  --accent: #e8c547;
+  --accent2: #4f8ef7;
+  --accent3: #e05c7a;
+  --success: #4ecb71;
+
+  /* Layout */
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-family: var(--font-dm-sans), var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}

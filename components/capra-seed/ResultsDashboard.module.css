@@ -1,0 +1,321 @@
+.dashboard {
+  min-height: 100vh;
+}
+
+/* ── Progress bar ──────────────────────────────────────────────────────────── */
+
+.progressBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.06);
+  z-index: 100;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent2), var(--accent));
+  transition: width 0.6s ease;
+}
+
+.progressFill.done {
+  background: var(--success);
+}
+
+/* ── Header ────────────────────────────────────────────────────────────────── */
+
+.header {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 2.25rem 1.5rem 1.25rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.badge {
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  opacity: 0.8;
+}
+
+/* Report title — AI tagline or shortened idea */
+.title {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-size: 1.65rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+/* One-line subtitle derived from overview.description */
+.subtitle {
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 0.1rem 0 0;
+  max-width: 560px;
+  opacity: 0.75;
+}
+
+/* Collapsible "original brief" toggle */
+.briefToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: none;
+  border: none;
+  padding: 0;
+  margin-top: 0.25rem;
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0.45;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.briefToggle:hover {
+  opacity: 0.75;
+}
+
+/* Original brief text shown when expanded */
+.briefText {
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0.25rem 0 0;
+  max-width: 560px;
+  padding: 0.65rem 0.9rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-left: 2px solid rgba(232, 197, 71, 0.3);
+  border-radius: 0 8px 8px 0;
+  opacity: 0.8;
+}
+
+.headerRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.completeBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--success);
+  background: rgba(78, 203, 113, 0.1);
+  border: 1px solid rgba(78, 203, 113, 0.2);
+  padding: 0.35rem 0.75rem;
+  border-radius: 100px;
+}
+
+.analyzingBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent2);
+  background: rgba(79, 142, 247, 0.1);
+  border: 1px solid rgba(79, 142, 247, 0.2);
+  padding: 0.35rem 0.75rem;
+  border-radius: 100px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  background: currentColor;
+  border-radius: 50%;
+}
+
+.spinner {
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.resetBtn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted);
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  padding: 0.45rem 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.resetBtn:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--text);
+}
+
+.saveBtn {
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  color: #0a0a0a;
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 0.45rem 0.9rem;
+  cursor: pointer;
+  transition: opacity 0.2s, background 0.2s;
+}
+
+.saveBtn:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.saveBtn.saveBtnSaved {
+  background: var(--success, #4ecb71);
+  border-color: var(--success, #4ecb71);
+}
+
+.saveBtn.saveBtnError {
+  background: transparent;
+  border-color: var(--error, #e05c5c);
+  color: var(--error, #e05c5c);
+}
+
+.viewSavedBtn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted);
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  padding: 0.45rem 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.viewSavedBtn:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--text);
+}
+
+/* ── Usage panel ────────────────────────────────────────────────────────────── */
+
+.usageRow {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem 0;
+}
+
+/* ── Card grid ──────────────────────────────────────────────────────────────── */
+
+.grid {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 1.5rem 4rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+.half {
+  grid-column: span 1;
+}
+
+/* ── Section dividers ───────────────────────────────────────────────────────── */
+
+.sectionDivider {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: 2rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid var(--border);
+  /* Offset scroll position so sticky nav doesn't overlap the heading */
+  scroll-margin-top: 48px;
+}
+
+/* The first section (Summary) needs no top separator */
+.sectionFirst {
+  border-top: none;
+  padding-top: 1.25rem;
+  margin-top: 0;
+}
+
+.sectionLabel {
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.57rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0.38;
+  flex-shrink: 0;
+}
+
+/* Fade-out rule after the label */
+.sectionDivider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border) 0%, transparent 100%);
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────────── */
+
+@media (max-width: 720px) {
+  .half {
+    grid-column: 1 / -1;
+  }
+
+  .header {
+    flex-direction: column;
+  }
+
+  .headerRight {
+    align-items: flex-start;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}

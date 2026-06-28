@@ -1,35 +1,46 @@
-import type { Metadata } from "next"
-import Script from "next/script"
-import { createClient } from "@/lib/supabase-server"
-import "./globals.css"
+import { Playfair_Display, DM_Sans, DM_Mono } from "next/font/google";
+import type { Metadata } from "next";
+import Script from "next/script";
+import "./globals.css";
+import styles from "./layout.module.css";
 
 export const metadata: Metadata = {
   title: "CapraStarter",
-  description: "CapraStarter — launching soon.",
-}
+  description: "Venture seed analysis and launch blueprint generator.",
+};
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
+  display: "swap",
+});
 
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
+  display: "swap",
+});
+
+const dmMono = DM_Mono({
+  subsets: ["latin"],
+  weight: ["300", "400", "500"],
+  variable: "--font-dm-mono",
+  display: "swap",
+});
+
+export default function CapraStarterLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
-      <body>
-        <nav className="navbar">
-          <div className="container navbar-inner">
-            <a href="/" className="navbar-brand">Capra<span>Starter</span></a>
-            <div className="navbar-links">
-              {user ? (
-                <a href="/dashboard" className="btn btn-primary" style={{ padding: "8px 16px", fontSize: "14px" }}>Dashboard</a>
-              ) : (
-                <a href="/login" className="btn btn-primary" style={{ padding: "8px 16px", fontSize: "14px" }}>Sign in</a>
-              )}
-            </div>
-          </div>
-        </nav>
+      <body
+        className={`${playfair.variable} ${dmSans.variable} ${dmMono.variable} ${styles.root}`}
+      >
         {children}
         <Script src="https://capralens.com/capralens.js" data-property="caprastarter" data-endpoint="https://capralens.com/api/capralens/collect" strategy="afterInteractive" />
       </body>
     </html>
-  )
+  );
 }

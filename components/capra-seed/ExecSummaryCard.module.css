@@ -1,0 +1,185 @@
+/* ─── Executive Summary Card ─────────────────────────────────────────────────── */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* Multi-stop accent stripe — one colour per insight category */
+.card::before {
+  content: "";
+  display: block;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--accent)  0%,
+    var(--accent2) 40%,
+    var(--success) 75%,
+    var(--accent3) 100%
+  );
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────────── */
+
+.header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.9rem 1.5rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.badge {
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.hint {
+  font-size: 0.74rem;
+  color: var(--muted);
+  opacity: 0.5;
+}
+
+/* ── Stats grid ─────────────────────────────────────────────────────────────── */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  border-bottom: 1px solid var(--border);
+}
+
+@media (max-width: 900px) {
+  .stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.85rem 1.1rem;
+  /* Inset box-shadow gives a right separator without affecting layout */
+  box-shadow: inset -1px 0 0 var(--border);
+}
+
+.stat:last-child {
+  box-shadow: none;
+}
+
+.statLabel {
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.57rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0.6;
+  white-space: nowrap;
+}
+
+.statValue {
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text);
+}
+
+/* Accent colour variants */
+.gold  .statValue { color: var(--accent); }
+.blue  .statValue { color: var(--accent2); }
+.green .statValue { color: var(--success); }
+
+.statEmpty {
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.8rem;
+  color: var(--muted);
+  opacity: 0.25;
+}
+
+/* ── Loading pulse ───────────────────────────────────────────────────────────── */
+
+.pulse {
+  display: block;
+  height: 14px;
+  width: 55%;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 3px;
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+.pulseFull {
+  width: 80%;
+  height: 12px;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.35; }
+  50%       { opacity: 0.85; }
+}
+
+/* ── Footer row (risk + next step) ──────────────────────────────────────────── */
+
+.footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 600px) {
+  .footer {
+    grid-template-columns: 1fr;
+  }
+}
+
+.footerCell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.85rem 1.5rem;
+}
+
+.footerCell:first-child {
+  box-shadow: inset -1px 0 0 var(--border);
+}
+
+@media (max-width: 600px) {
+  .footerCell:first-child {
+    box-shadow: none;
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+.footerLabel {
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.57rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+.footerText {
+  font-size: 0.82rem;
+  color: var(--text);
+  line-height: 1.55;
+  margin: 0;
+  opacity: 0.85;
+}
+
+.riskText {
+  color: var(--accent3);
+  opacity: 0.9;
+}

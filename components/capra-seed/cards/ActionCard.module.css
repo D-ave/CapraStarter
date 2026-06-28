@@ -1,0 +1,135 @@
+/* ── Phase-grouped layout ─────────────────────────────────────────────────── */
+
+.phases {
+  display: flex;
+  flex-direction: column;
+}
+
+.phaseGroup {
+  border-bottom: 1px solid var(--border);
+}
+
+.phaseGroup:last-child {
+  border-bottom: none;
+}
+
+/* Clickable phase header row */
+.phaseHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0.75rem 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.phaseName {
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* Phase name colour variants */
+.nameWeek12 { color: var(--accent); }
+.nameWeek34 { color: var(--accent2); }
+.nameMonth2 { color: var(--success); }
+.nameMonth3 { color: #9b7fd4; }
+
+.phaseCount {
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  opacity: 0.5;
+}
+
+.chevron {
+  margin-left: auto;
+  font-size: 0.72rem;
+  color: var(--muted);
+  opacity: 0.45;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+/* ── Step list ───────────────────────────────────────────────────────────── */
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.item:first-child {
+  border-top: none;
+}
+
+.number {
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+  opacity: 0.45;
+  flex-shrink: 0;
+  padding-top: 0.15em;
+  min-width: 2ch;
+}
+
+.step {
+  font-size: 0.88rem;
+  color: var(--text);
+  line-height: 1.5;
+  flex: 1;
+}
+
+/* ── Kept for backward compat / unused in grouped view ───────────────────── */
+
+.body {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.phase {
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.22rem 0.6rem;
+  border-radius: 100px;
+  flex-shrink: 0;
+  margin-top: 0.1em;
+}
+
+.week12 { background: rgba(232, 197, 71, 0.12);  color: var(--accent); }
+.week34 { background: rgba(79, 142, 247, 0.12);  color: var(--accent2); }
+.month2 { background: rgba(78, 203, 113, 0.12);  color: var(--success); }
+.month3 { background: rgba(123, 94, 167, 0.12);  color: #9b7fd4; }
+
+@media (max-width: 540px) {
+  .body {
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+}

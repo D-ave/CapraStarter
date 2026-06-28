@@ -10,7 +10,6 @@ function getClient(): Stripe {
   return _client;
 }
 
-// Proxy defers instantiation until first use inside a request handler
 export const stripe: Stripe = new Proxy({} as Stripe, {
   get(_t, prop: string | symbol) {
     return Reflect.get(getClient(), prop);
@@ -18,13 +17,7 @@ export const stripe: Stripe = new Proxy({} as Stripe, {
 });
 
 export const PRICES: Record<string, string | undefined> = {
-  export: process.env.STRIPE_PRICE_EXPORT,
+  analyst: process.env.STRIPE_PRICE_ANALYST,
   pro: process.env.STRIPE_PRICE_PRO,
-  agency: process.env.STRIPE_PRICE_AGENCY,
-};
-
-export const PRICE_MODES: Record<string, "payment" | "subscription"> = {
-  export: "payment",
-  pro: "subscription",
-  agency: "subscription",
+  studio: process.env.STRIPE_PRICE_STUDIO,
 };

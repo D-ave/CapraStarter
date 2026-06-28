@@ -1,0 +1,79 @@
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+@media (max-width: 480px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
+.quadrant {
+  border-radius: 10px;
+  padding: 0.85rem;
+  border: 1px solid transparent;
+}
+
+/* Color-coded quadrants */
+.quad1 {
+  background: rgba(78, 203, 113, 0.07);
+  border-color: rgba(78, 203, 113, 0.18);
+}
+
+.quad2 {
+  background: rgba(224, 92, 122, 0.07);
+  border-color: rgba(224, 92, 122, 0.18);
+}
+
+.quad3 {
+  background: rgba(79, 142, 247, 0.07);
+  border-color: rgba(79, 142, 247, 0.18);
+}
+
+.quad4 {
+  background: rgba(232, 197, 71, 0.07);
+  border-color: rgba(232, 197, 71, 0.18);
+}
+
+.quadLabel {
+  display: block;
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.65rem;
+  font-weight: 500;
+}
+
+.quad1 .quadLabel { color: var(--success); }
+.quad2 .quadLabel { color: var(--accent3); }
+.quad3 .quadLabel { color: var(--accent2); }
+.quad4 .quadLabel { color: var(--accent); }
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.bullet {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+  margin-top: 0.55em;
+  opacity: 0.7;
+}

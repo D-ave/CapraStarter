@@ -1,0 +1,114 @@
+.heuristicNote {
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+  opacity: 0.6;
+  margin: 0 0 1rem;
+  padding: 0.4rem 0.65rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 2px solid #7b5ea7;
+  border-radius: 0 4px 4px 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.9rem;
+}
+
+@media (max-width: 760px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  transition: border-color 0.2s;
+}
+
+.card:hover {
+  border-color: rgba(123, 94, 167, 0.3);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.rank {
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+.name {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.reason {
+  font-size: 0.84rem;
+  color: var(--muted);
+  line-height: 1.55;
+  margin: 0;
+  flex: 1;
+}
+
+.ratings {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.ratingLabel {
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+.pip {
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.18rem 0.55rem;
+  border-radius: 100px;
+}
+
+.low {
+  background: rgba(224, 92, 122, 0.12);
+  color: var(--accent3);
+}
+
+.medium {
+  background: rgba(232, 197, 71, 0.12);
+  color: var(--accent);
+}
+
+.high {
+  background: rgba(78, 203, 113, 0.12);
+  color: var(--success);
+}

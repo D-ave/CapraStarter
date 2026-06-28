@@ -1,0 +1,99 @@
+.heuristicNote {
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+  opacity: 0.6;
+  margin: 0 0 1rem;
+  padding: 0.4rem 0.65rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 2px solid var(--accent3);
+  border-radius: 0 4px 4px 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 0.9rem;
+}
+
+.card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  transition: border-color 0.2s;
+}
+
+.card:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.badge {
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.55rem;
+  border-radius: 100px;
+  flex-shrink: 0;
+}
+
+.direct {
+  background: rgba(224, 92, 122, 0.12);
+  color: var(--accent3);
+}
+
+.indirect {
+  background: rgba(79, 142, 247, 0.12);
+  color: var(--accent2);
+}
+
+.emerging {
+  background: rgba(232, 197, 71, 0.12);
+  color: var(--accent);
+}
+
+.description {
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.differentiator {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.82rem;
+  color: var(--text);
+  line-height: 1.45;
+  padding: 0.55rem 0.7rem;
+  background: rgba(78, 203, 113, 0.06);
+  border-left: 2px solid var(--success);
+  border-radius: 0 5px 5px 0;
+}
+
+.diffLabel {
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--success);
+  opacity: 0.8;
+}

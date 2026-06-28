@@ -1,0 +1,124 @@
+.modelRow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.1rem;
+}
+
+.modelLabel {
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0.65;
+}
+
+.modelName {
+  font-size: 0.88rem;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.tiers {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.tier {
+  position: relative;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.9rem;
+  transition: border-color 0.2s;
+}
+
+.tier.recommended {
+  background: rgba(232, 197, 71, 0.05);
+  border-color: rgba(232, 197, 71, 0.25);
+}
+
+.recommendedLabel {
+  position: absolute;
+  top: -1px;
+  right: 0.75rem;
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #0a0a0f;
+  background: var(--accent);
+  padding: 0.18rem 0.55rem;
+  border-radius: 0 0 6px 6px;
+}
+
+.tierHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 0.65rem;
+}
+
+.tierName {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.tierPrice {
+  display: flex;
+  align-items: baseline;
+  gap: 0.2rem;
+}
+
+.price {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.period {
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+}
+
+.featureList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.featureItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.check {
+  color: var(--success);
+  font-size: 0.75rem;
+  margin-top: 0.1em;
+  flex-shrink: 0;
+}
+
+.rationale {
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-style: italic;
+  line-height: 1.55;
+  margin: 0;
+  padding: 0.65rem 0.85rem;
+  border-top: 1px solid var(--border);
+}

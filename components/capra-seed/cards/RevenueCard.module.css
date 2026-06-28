@@ -1,0 +1,103 @@
+.heuristicNote {
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+  opacity: 0.6;
+  margin: 0 0 1rem;
+  padding: 0.4rem 0.65rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 2px solid var(--success);
+  border-radius: 0 4px 4px 0;
+}
+
+.projections {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.year {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  background: rgba(78, 203, 113, 0.06);
+  border: 1px solid rgba(78, 203, 113, 0.15);
+  border-radius: 9px;
+  padding: 0.85rem;
+}
+
+.yearLabel {
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--success);
+  opacity: 0.8;
+}
+
+.yearValue {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.7rem 0.85rem;
+}
+
+.statLabel {
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0.65;
+}
+
+.statValue {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.assumption {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.85rem;
+}
+
+.assumptionLabel {
+  display: block;
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0.65;
+  margin-bottom: 0.4rem;
+}
+
+.assumptionText {
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.55;
+  margin: 0;
+  font-style: italic;
+}

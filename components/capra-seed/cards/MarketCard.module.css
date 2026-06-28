@@ -1,0 +1,99 @@
+.heuristicNote {
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+  opacity: 0.6;
+  margin: 0 0 1rem;
+  padding: 0.4rem 0.65rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 2px solid var(--accent);
+  border-radius: 0 4px 4px 0;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 0.85rem;
+}
+
+.metricLabel {
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0.7;
+}
+
+.metricValue {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent2);
+  letter-spacing: -0.02em;
+}
+
+.section {
+  margin-bottom: 1rem;
+}
+
+.sectionLabel {
+  display: block;
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0.6;
+  margin-bottom: 0.55rem;
+}
+
+.trends {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.trend {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.88rem;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.trendDot {
+  width: 5px;
+  height: 5px;
+  background: var(--accent2);
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 0.45em;
+}
+
+.insight {
+  font-size: 0.88rem;
+  color: var(--text);
+  line-height: 1.55;
+  padding: 0.65rem 0.85rem;
+  background: rgba(79, 142, 247, 0.07);
+  border-left: 2px solid var(--accent2);
+  border-radius: 0 6px 6px 0;
+}
+
+.insightNeg {
+  background: rgba(224, 92, 122, 0.07);
+  border-left-color: var(--accent3);
+}
