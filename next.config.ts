@@ -2,12 +2,12 @@ import type { NextConfig } from "next";
 
 const securityHeaders = [
   {
-    key: "X-Content-Type-Options",
-    value: "nosniff",
-  },
-  {
     key: "X-Frame-Options",
     value: "DENY",
+  },
+  {
+    key: "X-Content-Type-Options",
+    value: "nosniff",
   },
   {
     key: "Referrer-Policy",
@@ -16,6 +16,15 @@ const securityHeaders = [
   {
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=()",
+  },
+  {
+    key: "X-DNS-Prefetch-Control",
+    value: "on",
+  },
+  {
+    key: "Content-Security-Policy",
+    value:
+      "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src * data: blob:; font-src 'self' data: https:; connect-src 'self' https: wss:; frame-src https:; frame-ancestors 'none'; object-src 'none'; base-uri 'self';",
   },
   {
     key: "Strict-Transport-Security",
@@ -27,7 +36,7 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: "/:path*",
+        source: "/(.*)",
         headers: securityHeaders,
       },
     ];
