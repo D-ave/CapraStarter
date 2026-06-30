@@ -17,6 +17,31 @@ const TIER_LIMITS: Record<string, number> = {
   studio: 9999,
 };
 
+// In-memory sliding-window rate limiter: 30 requests/min per IP.
+// Single-instance only — for multi-instance deployments swap for Redis/KV.
+const _rateMap = new Map<string, { count: number; resetAt: number }>();
+
+function getClientIp(req: NextRequest): string {
+  return (
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    req.headers.get("x-real-ip") ??
+    "unknown"
+  );
+}
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const WINDOW_MS = 60_000;
+  const LIMIT = 30;
+  const entry = _rateMap.get(ip);
+  if (!entry || entry.resetAt < now) {
+    _rateMap.set(ip, { count: 1, resetAt: now + WINDOW_MS });
+    return false;
+  }
+  entry.count += 1;
+  return entry.count > LIMIT;
+}
+
 async function getUserTier(userId: string): Promise<string> {
   const supabase = await createClient();
   const { data } = await supabase
@@ -42,8 +67,16 @@ async function getMonthlyReportCount(userId: string): Promise<number> {
 }
 
 export async function POST(request: NextRequest) {
-  let body: Partial<CapraSeedRequestV1>;
+  // Per-IP rate limit check
+  const ip = getClientIp(request);
+  if (isRateLimited(ip)) {
+    return NextResponse.json(
+      { error: "Too many requests — please slow down." },
+      { status: 429, headers: { "Retry-After": "60" } }
+    );
+  }
 
+  let body: Partial<CapraSeedRequestV1>;
   try {
     body = await request.json();
   } catch {
@@ -66,7 +99,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Tier enforcement: check limits on the first section of each analysis
+  // Tier enforcement: check monthly limit on the first section of each analysis
   if (section === "overview") {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();

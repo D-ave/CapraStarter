@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import styles from "./layout.module.css";
+import UserNav from "@/components/UserNav";
 
 export const metadata: Metadata = {
   title: "CapraStarter",
@@ -38,6 +39,7 @@ export default function CapraStarterLayout({
       <body
         className={`${playfair.variable} ${dmSans.variable} ${dmMono.variable} ${styles.root}`}
       >
+        <UserNav />
         {children}
         <Script src="https://capralens.com/capralens.js" data-property="caprastarter" data-endpoint="https://capralens.com/api/capralens/collect" strategy="afterInteractive" />
       </body>

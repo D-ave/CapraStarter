@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+const isDev = process.env.NODE_ENV === "development";
+
 const securityHeaders = [
   {
     key: "X-Frame-Options",
@@ -23,8 +25,8 @@ const securityHeaders = [
   },
   {
     key: "Content-Security-Policy",
-    value:
-      "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src * data: blob:; font-src 'self' data: https:; connect-src 'self' https: wss:; frame-src https:; frame-ancestors 'none'; object-src 'none'; base-uri 'self';",
+    // unsafe-eval removed in production; only needed for Next.js HMR in dev
+    value: `default-src 'self'; script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https:; style-src 'self' 'unsafe-inline' https:; img-src * data: blob:; font-src 'self' data: https:; connect-src 'self' https: wss:; frame-src https:; frame-ancestors 'none'; object-src 'none'; base-uri 'self';`,
   },
   {
     key: "Strict-Transport-Security",

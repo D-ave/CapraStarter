@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Hero from "@/components/capra-seed/Hero";
 import ResultsDashboard from "@/components/capra-seed/ResultsDashboard";
 import SavedReportsList from "@/components/capra-seed/SavedReportsList";
@@ -69,6 +69,42 @@ function computeUsageTotals(bySection: Partial<Record<SectionId, SectionUsage>>)
   return { totalInputTokens, totalOutputTokens, totalEstimatedCostUsd };
 }
 
+interface Toast {
+  msg: string;
+  type: "success" | "error";
+}
+
+function ToastBanner({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }) {
+  const isSuccess = toast.type === "success";
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      style={{
+        position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)",
+        zIndex: 2000,
+        background: isSuccess ? "rgba(34,197,94,0.12)" : "rgba(239,68,68,0.12)",
+        border: `1px solid ${isSuccess ? "rgba(34,197,94,0.35)" : "rgba(239,68,68,0.35)"}`,
+        color: "#fff", borderRadius: 12, padding: "11px 20px",
+        fontSize: 13, fontWeight: 500,
+        boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+        display: "flex", gap: 10, alignItems: "center",
+        whiteSpace: "nowrap", maxWidth: "calc(100vw - 48px)",
+      }}
+    >
+      <span style={{ color: isSuccess ? "#22c55e" : "#ef4444" }}>{isSuccess ? "✓" : "✗"}</span>
+      {toast.msg}
+      <button
+        aria-label="Dismiss"
+        onClick={onDismiss}
+        style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", cursor: "pointer", fontSize: 18, padding: "0 0 0 4px", lineHeight: 1 }}
+      >
+        ×
+      </button>
+    </div>
+  );
+}
+
 export default function CapraSeedPage() {
   const [phase, setPhase] = useState<"hero" | "results" | "saved-reports">("hero");
   const [progress, setProgress] = useState(0);
@@ -77,6 +113,33 @@ export default function CapraSeedPage() {
   const [currentInputs, setCurrentInputs] = useState<Omit<CapraSeedRequestV1, "section"> | null>(null);
   const [usageBySection, setUsageBySection] = useState<Partial<Record<SectionId, SectionUsage>>>({});
   const [saveState, setSaveState] = useState<SaveState>("idle");
+  const [toast, setToast] = useState<Toast | null>(null);
+
+  const showToast = useCallback((msg: string, type: Toast["type"], duration = 4000) => {
+    setToast({ msg, type });
+    if (duration > 0) {
+      const t = setTimeout(() => setToast(null), duration);
+      return () => clearTimeout(t);
+    }
+  }, []);
+
+  // Detect Stripe checkout success redirect
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("checkout") === "success") {
+      showToast("Subscription activated — welcome aboard!", "success", 6000);
+      const url = new URL(window.location.href);
+      url.searchParams.delete("checkout");
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, [showToast]);
+
+  // Toast on save state changes
+  useEffect(() => {
+    if (saveState === "error") {
+      showToast("Save failed — please try again.", "error", 0);
+    }
+  }, [saveState, showToast]);
 
   const setSectionStatus = useCallback(
     (section: SectionId, status: "loading" | "done" | "error", data?: unknown) => {
@@ -165,13 +228,11 @@ export default function CapraSeedPage() {
   }, [currentIdea, currentInputs, state, usageBySection]);
 
   const handleOpenReport = useCallback(async (id: string) => {
-    console.log(`[CapraSeed] Opening report: ${id}`);
-
     const res = await fetch(`/api/capra-seed/reports/${id}`);
     if (!res.ok) {
       const errJson = await res.json().catch(() => ({}));
       const msg = (errJson as { error?: string }).error ?? `Load failed (${res.status})`;
-      console.error(`[CapraSeed] Report load error: ${msg}`);
+      showToast(`Failed to load report: ${msg}`, "error", 5000);
       throw new Error(msg);
     }
 
@@ -196,8 +257,7 @@ export default function CapraSeedPage() {
     setProgress(100);
     setSaveState("saved"); // already saved
     setPhase("results");
-    console.log(`[CapraSeed] Report ${id} loaded successfully`);
-  }, []);
+  }, [showToast]);
 
   const handleReset = useCallback(() => {
     setPhase("hero");
@@ -212,6 +272,8 @@ export default function CapraSeedPage() {
   const handleViewSaved = useCallback(() => {
     setPhase("saved-reports");
   }, []);
+
+  const toastEl = toast ? <ToastBanner toast={toast} onDismiss={() => setToast(null)} /> : null;
 
   if (phase === "hero") {
     const PRICING_TIERS = [
@@ -317,36 +379,45 @@ export default function CapraSeedPage() {
         <footer style={{ borderTop: `1px solid ${border}`, background: bg, padding: "20px 24px", textAlign: "center", fontSize: 13, color: muted }}>
           © {new Date().getFullYear()} CapraStarter · Powered by Claude AI
         </footer>
+        {toastEl}
       </>
     );
   }
 
   if (phase === "saved-reports") {
-    return <SavedReportsList onOpen={handleOpenReport} onBack={handleReset} />;
+    return (
+      <>
+        <SavedReportsList onOpen={handleOpenReport} onBack={handleReset} />
+        {toastEl}
+      </>
+    );
   }
 
   const { totalInputTokens, totalOutputTokens, totalEstimatedCostUsd } =
     computeUsageTotals(usageBySection);
 
   return (
-    <ResultsDashboard
-      state={state}
-      progress={progress}
-      idea={currentIdea}
-      onReset={handleReset}
-      inputs={{
-        targetAudience: currentInputs?.targetAudience,
-        region: currentInputs?.region,
-        tone: currentInputs?.tone,
-        pricingPreference: currentInputs?.pricingPreference,
-      }}
-      usageBySection={usageBySection}
-      totalInputTokens={totalInputTokens}
-      totalOutputTokens={totalOutputTokens}
-      totalEstimatedCostUsd={totalEstimatedCostUsd}
-      saveState={saveState}
-      onSave={handleSave}
-      onViewSaved={handleViewSaved}
-    />
+    <>
+      <ResultsDashboard
+        state={state}
+        progress={progress}
+        idea={currentIdea}
+        onReset={handleReset}
+        inputs={{
+          targetAudience: currentInputs?.targetAudience,
+          region: currentInputs?.region,
+          tone: currentInputs?.tone,
+          pricingPreference: currentInputs?.pricingPreference,
+        }}
+        usageBySection={usageBySection}
+        totalInputTokens={totalInputTokens}
+        totalOutputTokens={totalOutputTokens}
+        totalEstimatedCostUsd={totalEstimatedCostUsd}
+        saveState={saveState}
+        onSave={handleSave}
+        onViewSaved={handleViewSaved}
+      />
+      {toastEl}
+    </>
   );
 }

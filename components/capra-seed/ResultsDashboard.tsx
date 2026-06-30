@@ -19,6 +19,7 @@ import BuilderHandoffCard from "./BuilderHandoffCard";
 import CapraStarterCard from "./CapraStarterCard";
 import ExecSummaryCard from "./ExecSummaryCard";
 import SectionNav from "./SectionNav";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import type {
   AnalysisState,
   SectionId,
@@ -90,7 +91,14 @@ export default function ResultsDashboard({
   return (
     <div className={styles.dashboard}>
       {/* Fixed progress bar */}
-      <div className={styles.progressBar}>
+      <div
+        className={styles.progressBar}
+        role="progressbar"
+        aria-label="Analysis progress"
+        aria-valuenow={progress}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
         <div
           className={`${styles.progressFill} ${isDone ? styles.done : ""}`}
           style={{ width: `${progress}%` }}
@@ -119,11 +127,11 @@ export default function ResultsDashboard({
         </div>
         <div className={styles.headerRight}>
           {isDone ? (
-            <span className={styles.completeBadge}>
+            <span className={styles.completeBadge} aria-live="polite">
               <span className={styles.dot} /> Complete
             </span>
           ) : (
-            <span className={styles.analyzingBadge}>
+            <span className={styles.analyzingBadge} aria-live="polite">
               <span className={styles.spinner} /> Analyzing…
             </span>
           )}
@@ -164,6 +172,7 @@ export default function ResultsDashboard({
       )}
 
       {/* ── Main content grid ──────────────────────────────────────────────── */}
+      <ErrorBoundary>
       <main className={styles.grid}>
 
         {/* ── SUMMARY — exec stats + business model overview ───────────────── */}
@@ -247,6 +256,7 @@ export default function ResultsDashboard({
           <ActionCard status={state.action.status} data={state.action.data} />
         </div>
       </main>
+      </ErrorBoundary>
     </div>
   );
 }
