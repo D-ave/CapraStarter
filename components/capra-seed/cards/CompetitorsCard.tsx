@@ -1,5 +1,6 @@
 import BaseCard from "./BaseCard";
 import styles from "./CompetitorsCard.module.css";
+import { stripCites } from "@/lib/capra-seed/utils";
 import type { Competitor, SectionStatus } from "@/types/capra-seed";
 
 interface Props {
@@ -23,9 +24,6 @@ export default function CompetitorsCard({ status, data }: Props) {
     >
       {data && data.length > 0 && (
         <div className={styles.wrapper}>
-          <p className={styles.heuristicNote}>
-            ⚠ Competitor data is model-estimated — verify against current market reality
-          </p>
           <div className={styles.grid}>
             {data.map((c, i) => (
               <div key={i} className={styles.card}>
@@ -35,14 +33,15 @@ export default function CompetitorsCard({ status, data }: Props) {
                     {c.type}
                   </span>
                 </div>
-                <p className={styles.description}>{c.description}</p>
+                <p className={styles.description}>{stripCites(c.description)}</p>
                 <div className={styles.differentiator}>
                   <span className={styles.diffLabel}>Your edge</span>
-                  <span>{c.differentiator}</span>
+                  <span>{stripCites(c.differentiator)}</span>
                 </div>
               </div>
             ))}
           </div>
+          <p className={styles.footnote}>Model-estimated — verify against current market reality</p>
         </div>
       )}
     </BaseCard>

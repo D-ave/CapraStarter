@@ -6,7 +6,7 @@ import type { SectionStatus } from "@/types/capra-seed";
 
 interface BaseCardProps {
   title: string;
-  icon: string;
+  icon?: string;
   accentColor: string;
   status: SectionStatus;
   children?: React.ReactNode;
@@ -47,19 +47,12 @@ export default function BaseCard({
       <div className={styles.accentBar} style={{ background: accentColor }} />
 
       <div className={styles.header}>
-        <span className={styles.icon}>{icon}</span>
         <span className={styles.title}>{title}</span>
 
         {status === "loading" && (
           <span className={`${styles.statusBadge} ${styles.loading}`}>
             <span className={styles.spinner} />
             Analyzing
-          </span>
-        )}
-        {status === "done" && (
-          <span className={`${styles.statusBadge} ${styles.done}`}>
-            <span className={styles.dot} />
-            Done
           </span>
         )}
         {status === "error" && (

@@ -1,5 +1,6 @@
 import BaseCard from "./BaseCard";
 import styles from "./CostsCard.module.css";
+import { stripCites } from "@/lib/capra-seed/utils";
 import type { CostsData, SectionStatus } from "@/types/capra-seed";
 
 interface Props {
@@ -17,10 +18,6 @@ export default function CostsCard({ status, data }: Props) {
     >
       {data && (
         <div className={styles.costs}>
-          <p className={styles.heuristicNote}>
-            ⚠ These are rough estimates only — actual costs will vary by location, supplier, and circumstances
-          </p>
-
           <div className={styles.summary}>
             <div className={styles.range}>
               <span className={styles.rangeLabel}>Estimated Range</span>
@@ -37,10 +34,11 @@ export default function CostsCard({ status, data }: Props) {
                   <span className={styles.catName}>{cat.name}</span>
                   <span className={styles.catCost}>{cat.estimatedCost}</span>
                 </div>
-                <p className={styles.catNotes}>{cat.notes}</p>
+                <p className={styles.catNotes}>{stripCites(cat.notes)}</p>
               </div>
             ))}
           </div>
+          <p className={styles.footnote}>Rough estimates — actual costs vary by location and supplier</p>
         </div>
       )}
     </BaseCard>

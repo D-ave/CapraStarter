@@ -1,5 +1,6 @@
 import BaseCard from "./BaseCard";
 import styles from "./SwotCard.module.css";
+import { stripCites } from "@/lib/capra-seed/utils";
 import type { SwotData, SectionStatus } from "@/types/capra-seed";
 
 interface Props {
@@ -31,7 +32,7 @@ export default function SwotCard({ status, data }: Props) {
                 {(data[key] ?? []).map((item, i) => (
                   <li key={i} className={styles.item}>
                     <span className={styles.bullet} />
-                    {item}
+                    {stripCites(item)}
                   </li>
                 ))}
               </ul>

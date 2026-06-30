@@ -1,13 +1,9 @@
-.heuristicNote {
-  font-family: var(--font-dm-mono), monospace;
+.footnote {
+  margin: 1rem 0 0;
   font-size: 0.65rem;
   color: var(--muted);
-  opacity: 0.6;
-  margin: 0 0 1rem;
-  padding: 0.4rem 0.65rem;
-  background: rgba(255, 255, 255, 0.03);
-  border-left: 2px solid #7b5ea7;
-  border-radius: 0 4px 4px 0;
+  opacity: 0.3;
+  font-style: italic;
 }
 
 .grid {

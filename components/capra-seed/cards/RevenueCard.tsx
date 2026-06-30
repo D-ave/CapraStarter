@@ -1,5 +1,6 @@
 import BaseCard from "./BaseCard";
 import styles from "./RevenueCard.module.css";
+import { stripCites } from "@/lib/capra-seed/utils";
 import type { RevenueData, SectionStatus } from "@/types/capra-seed";
 
 interface Props {
@@ -17,10 +18,6 @@ export default function RevenueCard({ status, data }: Props) {
     >
       {data && (
         <div className={styles.revenue}>
-          <p className={styles.heuristicNote}>
-            ⚠ Projections are heuristic estimates — not financial advice
-          </p>
-
           <div className={styles.projections}>
             {[
               { label: "Year 1", value: data.year1Revenue },
@@ -47,8 +44,9 @@ export default function RevenueCard({ status, data }: Props) {
 
           <div className={styles.assumption}>
             <span className={styles.assumptionLabel}>Key Assumption</span>
-            <p className={styles.assumptionText}>{data.keyAssumption}</p>
+            <p className={styles.assumptionText}>{stripCites(data.keyAssumption)}</p>
           </div>
+          <p className={styles.footnote}>Heuristic estimates — not financial advice</p>
         </div>
       )}
     </BaseCard>

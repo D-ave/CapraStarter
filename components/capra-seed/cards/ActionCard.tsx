@@ -3,6 +3,7 @@
 import { useState } from "react";
 import BaseCard from "./BaseCard";
 import styles from "./ActionCard.module.css";
+import { stripCites } from "@/lib/capra-seed/utils";
 import type { ActionItem, SectionStatus } from "@/types/capra-seed";
 
 interface Props {
@@ -94,7 +95,7 @@ export default function ActionCard({ status, data }: Props) {
                           <span className={styles.number}>
                             {String(start + localIdx + 1).padStart(2, "0")}
                           </span>
-                          <span className={styles.step}>{item.step}</span>
+                          <span className={styles.step}>{stripCites(item.step)}</span>
                         </li>
                       ))}
                     </ol>

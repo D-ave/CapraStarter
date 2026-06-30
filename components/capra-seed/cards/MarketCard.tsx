@@ -1,5 +1,6 @@
 import BaseCard from "./BaseCard";
 import styles from "./MarketCard.module.css";
+import { stripCites } from "@/lib/capra-seed/utils";
 import type { MarketData, SectionStatus } from "@/types/capra-seed";
 
 interface Props {
@@ -17,10 +18,6 @@ export default function MarketCard({ status, data }: Props) {
     >
       {data && (
         <div className={styles.market}>
-          <p className={styles.heuristicNote}>
-            ⚠ Market data is model-estimated — verify with primary research
-          </p>
-
           <div className={styles.metrics}>
             <div className={styles.metric}>
               <span className={styles.metricLabel}>Market Size (TAM)</span>
@@ -38,7 +35,7 @@ export default function MarketCard({ status, data }: Props) {
               {[data.trend1, data.trend2, data.trend3].map((trend, i) => (
                 <div key={i} className={styles.trend}>
                   <div className={styles.trendDot} />
-                  <span>{trend}</span>
+                  <span>{stripCites(trend)}</span>
                 </div>
               ))}
             </div>
@@ -46,15 +43,17 @@ export default function MarketCard({ status, data }: Props) {
 
           <div className={styles.section}>
             <span className={styles.sectionLabel}>Opportunity</span>
-            <div className={styles.insight}>{data.opportunity}</div>
+            <div className={styles.insight}>{stripCites(data.opportunity)}</div>
           </div>
 
           <div className={styles.section}>
             <span className={styles.sectionLabel}>Key Challenge</span>
             <div className={`${styles.insight} ${styles.insightNeg}`}>
-              {data.challenge}
+              {stripCites(data.challenge)}
             </div>
           </div>
+
+          <p className={styles.footnote}>Model-estimated — verify with primary research</p>
         </div>
       )}
     </BaseCard>

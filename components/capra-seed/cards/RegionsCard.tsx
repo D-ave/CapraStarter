@@ -1,5 +1,6 @@
 import BaseCard from "./BaseCard";
 import styles from "./RegionsCard.module.css";
+import { stripCites } from "@/lib/capra-seed/utils";
 import type { RegionsData, RegionRecommendation, SectionStatus } from "@/types/capra-seed";
 
 interface Props {
@@ -31,9 +32,6 @@ export default function RegionsCard({ status, data }: Props) {
     >
       {data && data.regions && data.regions.length > 0 && (
         <div className={styles.wrapper}>
-          <p className={styles.heuristicNote}>
-            ⚠ These are model-estimated recommendations — not guaranteed market research. Verify before committing to a region.
-          </p>
           <div className={styles.grid}>
             {data.regions.map((r, i) => (
               <div key={i} className={styles.card}>
@@ -41,7 +39,7 @@ export default function RegionsCard({ status, data }: Props) {
                   <span className={styles.rank}>#{i + 1}</span>
                   <span className={styles.name}>{r.name}</span>
                 </div>
-                <p className={styles.reason}>{r.reason}</p>
+                <p className={styles.reason}>{stripCites(r.reason)}</p>
                 <div className={styles.ratings}>
                   <div className={styles.rating}>
                     <span className={styles.ratingLabel}>Market Fit</span>
@@ -59,6 +57,7 @@ export default function RegionsCard({ status, data }: Props) {
               </div>
             ))}
           </div>
+          <p className={styles.footnote}>Model-estimated — verify before committing to a region</p>
         </div>
       )}
     </BaseCard>
