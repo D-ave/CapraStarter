@@ -1,12 +1,6 @@
 // ─── CapraSeed LLM Layer ──────────────────────────────────────────────────────
-// Server-side only. Uses native fetch to call the Anthropic Messages API
-// without requiring @anthropic-ai/sdk in the studio package.json.
-//
-// TODO(integration): When @anthropic-ai/sdk is added to the main studio
-// package.json, replace the raw fetch calls below with the SDK client:
-//   import Anthropic from "@anthropic-ai/sdk";
-//   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-//   await client.messages.create(params) / client.beta.messages.create(params)
+// Server-side only. Uses native fetch to call the Anthropic Messages API.
+// This keeps the studio package lean — no SDK dependency required.
 
 import { SYSTEM_PROMPT, SEARCH_ENABLED_SECTIONS, getSectionPrompt } from "./prompts";
 import { getMockForSection } from "./mock";
