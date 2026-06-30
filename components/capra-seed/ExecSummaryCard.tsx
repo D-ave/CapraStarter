@@ -21,10 +21,12 @@ function deriveStats(state: AnalysisState): StatDef[] {
   const pricing = state.pricing.data;
   const regions = state.regions.data;
 
-  const pricingAnchor =
-    pricing?.tiers?.[0]
-      ? `${pricing.tiers[0].price} / ${pricing.tiers[0].period}`
-      : (pricing?.model ?? null);
+  const pricingAnchor = (() => {
+    if (!pricing?.tiers?.[0]) return pricing?.model ?? null;
+    const { price, period } = pricing.tiers[0];
+    const p = period?.replace(/^\/+/, "") ?? "";
+    return p ? `${price} / ${p}` : price;
+  })();
 
   const bestRegion = regions?.regions?.[0]?.name ?? null;
 
