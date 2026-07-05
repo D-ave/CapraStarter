@@ -41,7 +41,7 @@ export default function CapraStarterLayout({
       >
         <UserNav />
         {children}
-        <Script src="https://capralens.com/capralens.js" data-property="caprastarter" data-endpoint="https://capralens.com/api/capralens/collect" strategy="afterInteractive" />
+        <Script src="https://capralens.com/capralens.js" integrity="sha384-5MwE1nTjMxFr0AsDD0IjVfp3uwwBt3TNL/P8ySZKR+vMk8XqRvVAdHmfYBzfXyVt" crossOrigin="anonymous" data-property="caprastarter" data-endpoint="https://capralens.com/api/capralens/collect" strategy="afterInteractive" />
       </body>
     </html>
   );
