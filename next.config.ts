@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
-const isDev = process.env.NODE_ENV === "development";
-
+// Content-Security-Policy is intentionally NOT set here. It is generated
+// per-request in middleware.ts with a random nonce so script-src can stay
+// 'strict-dynamic' without 'unsafe-inline'/'unsafe-eval'.
 const securityHeaders = [
   {
     key: "X-Frame-Options",
@@ -22,11 +23,6 @@ const securityHeaders = [
   {
     key: "X-DNS-Prefetch-Control",
     value: "on",
-  },
-  {
-    key: "Content-Security-Policy",
-    // unsafe-eval removed in production; only needed for Next.js HMR in dev
-    value: `default-src 'self'; script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https:; style-src 'self' 'unsafe-inline' https:; img-src * data: blob:; font-src 'self' data: https:; connect-src 'self' https: wss:; frame-src https:; frame-ancestors 'none'; object-src 'none'; base-uri 'self';`,
   },
   {
     key: "Strict-Transport-Security",

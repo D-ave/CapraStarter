@@ -1,6 +1,7 @@
 import { Playfair_Display, DM_Sans, DM_Mono } from "next/font/google";
 import type { Metadata } from "next";
 import Script from "next/script";
+import { headers } from "next/headers";
 import "./globals.css";
 import styles from "./layout.module.css";
 import UserNav from "@/components/UserNav";
@@ -29,11 +30,15 @@ const dmMono = DM_Mono({
   display: "swap",
 });
 
-export default function CapraStarterLayout({
+export default async function CapraStarterLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // The CSP nonce is generated per-request in middleware.ts and forwarded via
+  // this request header so 'strict-dynamic' script-src trusts this tag.
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
+
   return (
     <html lang="en">
       <body
@@ -41,7 +46,7 @@ export default function CapraStarterLayout({
       >
         <UserNav />
         {children}
-        <Script src="https://capralens.com/capralens.js" integrity="sha384-5MwE1nTjMxFr0AsDD0IjVfp3uwwBt3TNL/P8ySZKR+vMk8XqRvVAdHmfYBzfXyVt" crossOrigin="anonymous" data-property="caprastarter" data-endpoint="https://capralens.com/api/capralens/collect" strategy="afterInteractive" />
+        <Script src="https://capralens.com/capralens.js" integrity="sha384-5MwE1nTjMxFr0AsDD0IjVfp3uwwBt3TNL/P8ySZKR+vMk8XqRvVAdHmfYBzfXyVt" crossOrigin="anonymous" data-property="caprastarter" data-endpoint="https://capralens.com/api/capralens/collect" strategy="afterInteractive" nonce={nonce} />
       </body>
     </html>
   );
