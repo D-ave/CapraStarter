@@ -37,3 +37,5 @@ language sql security definer as $$
   from token_usage where created_at >= now() - interval '14 days'
   group by 1 order by 1 desc;
 $$;
+
+grant all on public.token_usage to service_role;
