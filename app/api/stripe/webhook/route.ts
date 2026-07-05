@@ -5,6 +5,25 @@ import type Stripe from "stripe";
 
 export const dynamic = "force-dynamic";
 
+const TIER_LABELS: Record<string, string> = {
+  analyst: "Analyst",
+  pro: "Pro",
+  studio: "Studio",
+};
+
+async function sendResendEmail(payload: { to: string; subject: string; html: string; text: string }): Promise<void> {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.RESEND_FROM_EMAIL ?? "CapraStarter <noreply@caprastarter.com>";
+  if (!apiKey) return;
+  try {
+    await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ from, to: [payload.to], subject: payload.subject, html: payload.html, text: payload.text }),
+    });
+  } catch {}
+}
+
 export async function POST(req: NextRequest) {
   const body = await req.text();
   const sig = req.headers.get("stripe-signature") ?? "";
@@ -45,6 +64,16 @@ export async function POST(req: NextRequest) {
         console.error("[stripe/webhook] failed to record subscription:", error.message);
       } else {
         console.log("[stripe/webhook] subscription recorded:", { userId, tier });
+        const email = session.customer_email ?? session.customer_details?.email;
+        if (email) {
+          const label = TIER_LABELS[tier] ?? tier;
+          await sendResendEmail({
+            to: email,
+            subject: `You're on CapraStarter ${label}`,
+            html: `<p>Thanks for subscribing! You're now on the CapraStarter ${label} plan.</p><p><a href="https://www.caprastarter.com/">Open CapraStarter</a></p>`,
+            text: `Thanks for subscribing! You're now on the CapraStarter ${label} plan. Open CapraStarter: https://www.caprastarter.com/`,
+          });
+        }
       }
       break;
     }
