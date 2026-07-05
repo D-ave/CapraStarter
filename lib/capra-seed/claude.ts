@@ -122,14 +122,18 @@ async function callAnthropic({ userPrompt, model, maxTokens, useWebSearch }: Cal
 
   if (rawUsage) {
     const cost = estimateCostUsd(model, rawUsage.input_tokens, rawUsage.output_tokens)
-    void createAdminClient().from("token_usage").insert({
-      feature:       "capraseed-analysis",
-      user_id:       null,
-      model,
-      input_tokens:  rawUsage.input_tokens,
-      output_tokens: rawUsage.output_tokens,
-      cost_usd:      cost ?? 0,
-    })
+    void (async () => {
+      try {
+        await (createAdminClient() as any).from("token_usage").insert({
+          feature:       "capraseed-analysis",
+          user_id:       null,
+          model,
+          input_tokens:  rawUsage.input_tokens,
+          output_tokens: rawUsage.output_tokens,
+          cost_usd:      cost ?? 0,
+        })
+      } catch { /* logging must never surface to users */ }
+    })()
   }
 
   return { text, rawUsage };
