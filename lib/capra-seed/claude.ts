@@ -6,6 +6,7 @@ import { SYSTEM_PROMPT, SEARCH_ENABLED_SECTIONS, getSectionPrompt } from "./prom
 import { getMockForSection } from "./mock";
 import { estimateCostUsd } from "./pricing";
 import type { SectionId, CapraSeedRequestV1, SectionUsage } from "@/types/capra-seed";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
 
@@ -118,6 +119,18 @@ async function callAnthropic({ userPrompt, model, maxTokens, useWebSearch }: Cal
   const rawUsage = (json.usage && typeof json.usage.input_tokens === "number")
     ? { input_tokens: json.usage.input_tokens as number, output_tokens: (json.usage.output_tokens ?? 0) as number }
     : null;
+
+  if (rawUsage) {
+    const cost = estimateCostUsd(model, rawUsage.input_tokens, rawUsage.output_tokens)
+    void createAdminClient().from("token_usage").insert({
+      feature:       "capraseed-analysis",
+      user_id:       null,
+      model,
+      input_tokens:  rawUsage.input_tokens,
+      output_tokens: rawUsage.output_tokens,
+      cost_usd:      cost ?? 0,
+    })
+  }
 
   return { text, rawUsage };
 }
