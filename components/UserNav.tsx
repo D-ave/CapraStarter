@@ -50,6 +50,9 @@ export default function UserNav() {
           <a href="/api/stripe/portal" style={{ ...chipStyle, color: ACCENT }}>
             Billing
           </a>
+          <a href="/support" style={{ ...chipStyle, color: MUTED }}>
+            Support
+          </a>
           <button onClick={handleSignOut} style={{ ...chipStyle, color: MUTED, border: `1px solid ${BORDER}` }}>
             Sign out
           </button>
