@@ -99,22 +99,27 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Tier enforcement: check monthly limit on the first section of each analysis
-  if (section === "overview") {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+  // Authentication is REQUIRED for every section — each section triggers an
+  // Anthropic call on the shared API key, so no anonymous access is permitted.
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-    if (user) {
-      const tier = await getUserTier(user.id);
-      const limit = TIER_LIMITS[tier] ?? TIER_LIMITS.free;
-      const count = await getMonthlyReportCount(user.id);
-      if (count >= limit) {
-        return NextResponse.json(
-          { error: `Monthly report limit reached (${limit}). Upgrade your plan at /#pricing` },
-          { status: 429 },
-        );
-      }
-    }
+  if (!user) {
+    return NextResponse.json(
+      { error: "Authentication required." },
+      { status: 401 },
+    );
+  }
+
+  // Tier enforcement: apply the monthly report limit to every section.
+  const tier = await getUserTier(user.id);
+  const limit = TIER_LIMITS[tier] ?? TIER_LIMITS.free;
+  const count = await getMonthlyReportCount(user.id);
+  if (count >= limit) {
+    return NextResponse.json(
+      { error: `Monthly report limit reached (${limit}). Upgrade your plan at /#pricing` },
+      { status: 429 },
+    );
   }
 
   try {

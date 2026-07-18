@@ -11,6 +11,18 @@ const TIER_LABELS: Record<string, string> = {
   studio: "Studio",
 };
 
+// Maps a Stripe price id back to the tier it was purchased under, using the same
+// STRIPE_PRICE_* env vars used at checkout. Keeps `tier` in sync on plan changes
+// (e.g. a downgrade) so quota enforcement can't lag behind the real plan.
+function tierForPriceId(priceId: string | null): string | null {
+  if (!priceId) return null;
+  const priceToTier: Record<string, string> = {};
+  if (process.env.STRIPE_PRICE_ANALYST) priceToTier[process.env.STRIPE_PRICE_ANALYST] = "analyst";
+  if (process.env.STRIPE_PRICE_PRO) priceToTier[process.env.STRIPE_PRICE_PRO] = "pro";
+  if (process.env.STRIPE_PRICE_STUDIO) priceToTier[process.env.STRIPE_PRICE_STUDIO] = "studio";
+  return priceToTier[priceId] ?? null;
+}
+
 async function sendResendEmail(payload: { to: string; subject: string; html: string; text: string }): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.RESEND_FROM_EMAIL ?? "CapraStarter <noreply@caprastarter.com>";
@@ -89,10 +101,15 @@ export async function POST(req: NextRequest) {
 
       if (!customerId) break;
 
+      const mappedTier = tierForPriceId(priceId);
+
       const { error } = await supabase.from("subscriptions").upsert({
         stripe_customer_id: customerId,
         stripe_subscription_id: sub.id,
         stripe_price_id: priceId,
+        // Keep tier aligned with the current price so a downgrade lowers the cap.
+        // Only overwrite when the price maps to a known tier; otherwise leave it.
+        ...(mappedTier ? { tier: mappedTier } : {}),
         status: sub.status,
         cancel_at_period_end: sub.cancel_at_period_end,
         current_period_end: currentPeriodEnd,
