@@ -92,29 +92,59 @@ export async function POST(req: NextRequest) {
 
     case "customer.subscription.updated": {
       const sub = event.data.object as Stripe.Subscription;
-      const customerId = typeof sub.customer === "string" ? sub.customer : null;
       const priceId = sub.items.data[0]?.price?.id ?? null;
       const rawPeriodEnd = (sub as unknown as Record<string, unknown>).current_period_end;
       const currentPeriodEnd = typeof rawPeriodEnd === "number"
         ? new Date(rawPeriodEnd * 1000).toISOString()
         : null;
 
-      if (!customerId) break;
-
       const mappedTier = tierForPriceId(priceId);
 
-      const { error } = await supabase.from("subscriptions").upsert({
-        stripe_customer_id: customerId,
-        stripe_subscription_id: sub.id,
+      // Bookkeeping columns written on every status branch.
+      const base = {
         stripe_price_id: priceId,
-        // Keep tier aligned with the current price so a downgrade lowers the cap.
-        // Only overwrite when the price maps to a known tier; otherwise leave it.
-        ...(mappedTier ? { tier: mappedTier } : {}),
-        status: sub.status,
         cancel_at_period_end: sub.cancel_at_period_end,
         current_period_end: currentPeriodEnd,
         updated_at: new Date().toISOString(),
-      }, { onConflict: "stripe_subscription_id" });
+      };
+
+      // This event fires on EVERY attribute change — including transitions into
+      // delinquency — so tier may only be (re)granted when the sub is genuinely
+      // in good standing AND the price maps to a known tier.
+      let payload: Record<string, unknown>;
+      if (sub.status === "active" || sub.status === "trialing") {
+        if (mappedTier) {
+          // Good standing + mapped price: keep tier aligned with the current
+          // price so portal plan changes and past_due recovery both land.
+          payload = { ...base, tier: mappedTier, status: sub.status };
+        } else {
+          // Unmapped price (missing STRIPE_PRICE_* env or legacy price):
+          // sync status only — never grant, never downgrade.
+          console.warn("[stripe/webhook] unmapped price on active subscription:", priceId, sub.id);
+          payload = { ...base, status: sub.status };
+        }
+      } else if (sub.status === "past_due") {
+        // Retries still in flight: keep tier (grace), record the state.
+        payload = { ...base, status: "past_due" };
+      } else if (
+        sub.status === "unpaid" ||
+        sub.status === "canceled" ||
+        sub.status === "incomplete_expired"
+      ) {
+        // Lapsed: revoke to free.
+        payload = { ...base, tier: "free", status: "canceled" };
+      } else {
+        // incomplete / paused: record the state only, never a downgrade.
+        payload = { ...base, status: sub.status };
+      }
+
+      // UPDATE-only, keyed by subscription id: this event can arrive before
+      // checkout.session.completed, and an insert here would create a
+      // user_id-less orphan row that then blocks checkout's user_id-keyed
+      // upsert. Checkout owns row creation; this handler only syncs it.
+      const { error } = await supabase.from("subscriptions")
+        .update(payload)
+        .eq("stripe_subscription_id", sub.id);
 
       if (error) console.error("[stripe/webhook] subscription update failed:", error.message);
       else console.log("[stripe/webhook] subscription updated:", sub.id, sub.status);
@@ -124,23 +154,48 @@ export async function POST(req: NextRequest) {
     case "customer.subscription.deleted": {
       const sub = event.data.object as Stripe.Subscription;
       const { error } = await supabase.from("subscriptions")
-        .update({ status: "cancelled", updated_at: new Date().toISOString() })
+        .update({ status: "canceled", updated_at: new Date().toISOString() })
         .eq("stripe_subscription_id", sub.id);
 
       if (error) console.error("[stripe/webhook] subscription cancellation failed:", error.message);
-      else console.log("[stripe/webhook] subscription cancelled:", sub.id);
+      else console.log("[stripe/webhook] subscription canceled:", sub.id);
       break;
     }
 
     case "invoice.payment_failed": {
       const inv = event.data.object as Stripe.Invoice;
-      const customerId = typeof inv.customer === "string" ? inv.customer : null;
-      if (customerId) {
-        await supabase.from("subscriptions")
-          .update({ status: "past_due", updated_at: new Date().toISOString() })
-          .eq("stripe_customer_id", customerId);
+      // Newer API versions carry the invoice's subscription under
+      // parent.subscription_details; older payloads have a top-level
+      // inv.subscription. Either may be a string id or an expanded object.
+      const rawSub =
+        inv.parent?.subscription_details?.subscription ??
+        (inv as unknown as { subscription?: string | { id: string } }).subscription;
+      const subId = typeof rawSub === "string" ? rawSub : rawSub?.id ?? null;
+
+      // No subscription id => one-off invoice, nothing to touch. A failed
+      // FIRST invoice of a brand-new sub (subscription_create) has nothing to
+      // revoke either — tier is only granted via checkout success — and the
+      // customer may hold a separate healthy subscription.
+      if (!subId || inv.billing_reason === "subscription_create") {
+        console.warn("[stripe/webhook] payment failed (no subscription action):", inv.id);
+        break;
       }
-      console.warn("[stripe/webhook] payment failed:", inv.id);
+
+      // Keyed by the failing subscription (never by customer) so unrelated
+      // invoices can't cross-hit a healthy plan. next_payment_attempt is null
+      // once dunning is exhausted — final failure revokes to free; earlier
+      // attempts just mark past_due while retries continue (tier keeps grace).
+      const isFinalFailure = inv.next_payment_attempt == null;
+      const { error } = await supabase.from("subscriptions")
+        .update(
+          isFinalFailure
+            ? { tier: "free", status: "canceled", updated_at: new Date().toISOString() }
+            : { status: "past_due", updated_at: new Date().toISOString() }
+        )
+        .eq("stripe_subscription_id", subId);
+
+      if (error) console.error("[stripe/webhook] payment-failure update failed:", error.message);
+      else console.warn("[stripe/webhook] payment failed:", inv.id, subId, isFinalFailure ? "final" : "retrying");
       break;
     }
 
