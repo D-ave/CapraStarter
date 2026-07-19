@@ -44,8 +44,19 @@ export async function POST(req: NextRequest) {
   try {
     event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!);
   } catch (err) {
-    console.error("[stripe/webhook] signature verification failed:", err);
-    return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+    // Only a genuine signature mismatch is the caller's fault (400). Anything else
+    // — e.g. an empty STRIPE_SECRET_KEY crashing Stripe client construction — is OUR
+    // misconfiguration; surface it as a 500 with a truthful log instead of masking
+    // it as "Invalid signature" (which once sent us on a long false chase).
+    if ((err as { type?: string })?.type === "StripeSignatureVerificationError") {
+      console.error("[stripe/webhook] signature verification failed:", err);
+      return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+    }
+    console.error(
+      "[stripe/webhook] NON-SIGNATURE failure — likely misconfiguration (check STRIPE_SECRET_KEY / STRIPE_WEBHOOK_SECRET are set):",
+      err,
+    );
+    return NextResponse.json({ error: "Webhook handler misconfigured" }, { status: 500 });
   }
 
   const supabase = createAdminClient();
