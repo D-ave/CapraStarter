@@ -11,6 +11,39 @@ const TIER_LABELS: Record<string, string> = {
   studio: "Studio",
 };
 
+// The shared Stripe account fans every app's events out to every endpoint.
+// Checkout sessions and subscriptions are stamped with metadata.app at
+// creation, so events stamped for another app must be acknowledged and
+// dropped before they can touch our rows; unstamped events are pre-stamp
+// legacy traffic — also dropped, but counted.
+const APP_KEY = "caprastarter";
+
+const GATED_EVENT_FAMILIES = ["checkout.session.", "customer.subscription.", "invoice."];
+
+// Resolves the originating app for the event families this handler processes,
+// from the event object only (never an extra Stripe API call). Returns
+// undefined when the object carries no stamp.
+function appKeyForEvent(event: Stripe.Event): string | undefined {
+  if (event.type.startsWith("checkout.session.")) {
+    return (event.data.object as Stripe.Checkout.Session).metadata?.app;
+  }
+  if (event.type.startsWith("customer.subscription.")) {
+    return (event.data.object as Stripe.Subscription).metadata?.app;
+  }
+  if (event.type.startsWith("invoice.")) {
+    // Newer API versions carry the subscription stamp under
+    // parent.subscription_details; older payloads have a top-level
+    // subscription_details.
+    const inv = event.data.object as Stripe.Invoice;
+    return (
+      inv.parent?.subscription_details?.metadata?.app ??
+      (inv as unknown as { subscription_details?: { metadata?: { app?: string } } })
+        .subscription_details?.metadata?.app
+    );
+  }
+  return undefined;
+}
+
 // Maps a Stripe price id back to the tier it was purchased under, using the same
 // STRIPE_PRICE_* env vars used at checkout. Keeps `tier` in sync on plan changes
 // (e.g. a downgrade) so quota enforcement can't lag behind the real plan.
@@ -57,6 +90,22 @@ export async function POST(req: NextRequest) {
       err,
     );
     return NextResponse.json({ error: "Webhook handler misconfigured" }, { status: 500 });
+  }
+
+  // App ownership gate: runs after signature verification and before any DB
+  // write or email. Foreign and unstamped events get a 200 so Stripe never
+  // retries them — returning an error here would only build a retry queue of
+  // events that were never ours.
+  if (GATED_EVENT_FAMILIES.some((family) => event.type.startsWith(family))) {
+    const app = appKeyForEvent(event);
+    if (app !== APP_KEY) {
+      if (app === undefined) {
+        console.log("stripe_webhook_unstamped:", JSON.stringify({ event_id: event.id, type: event.type }));
+      } else {
+        console.log("[stripe/webhook] ignoring event stamped for another app:", event.type, event.id);
+      }
+      return NextResponse.json({ received: true });
+    }
   }
 
   const supabase = createAdminClient();
