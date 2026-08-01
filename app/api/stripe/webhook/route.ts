@@ -92,6 +92,29 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Webhook handler misconfigured" }, { status: 500 });
   }
 
+  // Mode consistency: the event's mode must match the mode of the key this
+  // deployment is configured with. A mismatch means the event belongs to the
+  // other Stripe mode entirely — a test-mode event reaching a live deployment
+  // would write test data into production tables and grant a real paid tier off
+  // a fake purchase (observed fleet-wide, 2026-08-01). Test-keyed deployments
+  // are legitimate pre-launch, so test events are only wrong where the key is
+  // live; the check is symmetric rather than a blanket test-mode rejection.
+  // Acknowledged with 200 and dropped: a mode mismatch is a standing
+  // misconfiguration, and a non-2xx would have Stripe retrying it for days.
+  const configuredLive = (process.env.STRIPE_SECRET_KEY ?? "").match(/^(sk|rk)_live_/) !== null;
+  if (event.livemode !== configuredLive) {
+    console.error(
+      "[stripe/webhook] livemode mismatch — event ignored:",
+      JSON.stringify({
+        event_id: event.id,
+        type: event.type,
+        event_livemode: event.livemode,
+        configured_livemode: configuredLive,
+      }),
+    );
+    return NextResponse.json({ received: true, ignored: "livemode-mismatch" });
+  }
+
   // App ownership gate: runs after signature verification and before any DB
   // write or email. Foreign and unstamped events get a 200 so Stripe never
   // retries them — returning an error here would only build a retry queue of
